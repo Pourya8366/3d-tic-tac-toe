@@ -14,8 +14,10 @@ $(function () {
 
         logic.fillInBoard(selectedPoint);
 
+        var winPath = logic.winCheck(selectedPoint);
 
-        if (logic.winCheck(selectedPoint)) {
+        if (winPath.length != 0) {
+            showWinPath(winPath);
             alert(logic.currentPlayer + " win!");
         } else {
             logic.changeTurn();
@@ -23,3 +25,12 @@ $(function () {
         }
     });
 });
+
+function showWinPath(winPath) {
+    var selectorID;
+    for (x in winPath) {
+        selectorID = "#p" + winPath[x][0] + winPath[x][1] + winPath[x][2];
+        $(selectorID).css("border-style", "solid");
+        $(selectorID).css("border-color", "red");
+    }
+};

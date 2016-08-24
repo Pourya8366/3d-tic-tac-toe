@@ -23,7 +23,8 @@ Logic.prototype.winCheck = function (selectedPoint) {
         count = 0,
         turn = 1,
         firstMate = 1,
-        secondMate = 1;
+        secondMate = 1,
+        winPath = [];
 
     if (this.currentPlayer == 'b') {
         turn = -1;
@@ -33,80 +34,154 @@ Logic.prototype.winCheck = function (selectedPoint) {
 
     //change x
     for (i = 0; i < 3; i++) {
-        if (this.board[i][selectedPoint[1]][selectedPoint[2]] == turn)
+        if (this.board[i][selectedPoint[1]][selectedPoint[2]] == turn) {
             count++;
-        else {
+            winPath.push([i, selectedPoint[1], selectedPoint[2]]);
+        } else {
+            winPath = [];
             break;
         }
     }
 
     if (count == 3) {
-        return true;
+        return winPath;
     }
 
     count = 0;
 
     //change y
     for (i = 0; i < 3; i++) {
-        if (this.board[selectedPoint[0]][i][selectedPoint[2]] == turn)
+        if (this.board[selectedPoint[0]][i][selectedPoint[2]] == turn) {
             count++;
-        else {
+            winPath.push([selectedPoint[0], i, selectedPoint[2]]);
+        } else {
+            winPath = [];
             break;
         }
     }
 
     if (count == 3) {
-        return true;
+        return winPath;
     }
 
     count = 0;
 
     //change z
     for (i = 0; i < 3; i++) {
-        if (this.board[selectedPoint[0]][selectedPoint[1]][i] == turn)
+        if (this.board[selectedPoint[0]][selectedPoint[1]][i] == turn) {
             count++;
-        else {
+            winPath.push([selectedPoint[0], selectedPoint[1], i]);
+        } else {
+            winPath = [];
             break;
         }
     }
 
     if (count == 3) {
-        return true;
+        return winPath;
     }
 
     count = 0;
 
     //-------------------------------------- two change! ------------------------------------------
+
+    firstMate = 1;
+    secondMate = 1;
+
+    if (selectedPoint[1] == 2) {
+        firstMate = -1;
+    }
+
+    if (selectedPoint[2] == 2) {
+        secondMate = -1;
+    }
+
+    //change y and z
+    if (selectedPoint[1] != 1 && selectedPoint[2] != 1) {
+        for (i = 0; i < 3; i++) {
+            if (this.board[selectedPoint[0]][selectedPoint[1] + (i * firstMate)][selectedPoint[2] + (i * secondMate)] == turn) {
+                count++;
+                winPath.push([selectedPoint[0], selectedPoint[1] + (i * firstMate), selectedPoint[2] + (i * secondMate)]);
+            } else {
+                winPath = [];
+                break;
+            }
+        }
+        if (count == 3) {
+            return winPath;
+        }
+        count = 0;
+    } else if (selectedPoint[1] == 1 && selectedPoint[2] == 1) {
+        //middle point
+
+        //1: start from selectedPoint[0][0][0]
+        for (i = 0; i < 3; i++) {
+            if (this.board[selectedPoint[0]][i][i] == turn) {
+                count++;
+                winPath.push([selectedPoint[0], i, i]);
+            } else {
+                winPath = [];
+                break;
+            }
+        }
+        if (count == 3) {
+            return winPath;
+        }
+        count = 0;
+
+        //2: start from selectedPoint[0][2][0]
+        for (i = 0; i < 3; i++) {
+            if (this.board[selectedPoint[0]][2 - i][i] == turn) {
+                count++;
+                winPath.push([selectedPoint[0], 2 - i, i]);
+            } else {
+                winPath = [];
+                break;
+            }
+        }
+        if (count == 3) {
+            return winPath;
+        }
+        count = 0;
+    }
+
     var validityForCheck1 = Math.abs(selectedPoint[0] - selectedPoint[1]);
     var validityForCheck2 = Math.abs(selectedPoint[0] - selectedPoint[2]);
-
+    
+    firstMate = 1;
+    secondMate = 1;
+    
     //Change x and y
     if (validityForCheck1 != 1) { //Allow for check
         if (selectedPoint[0] == 1) { //middle board
             //1: start from [0][0][selectedPoint[2]]
             for (i = 0; i < 3; i++) {
-                if (this.board[i][i][selectedPoint[2]] == turn)
+                if (this.board[i][i][selectedPoint[2]] == turn) {
                     count++;
-                else {
+                    winPath.push([i, i, selectedPoint[2]]);
+                } else {
+                    winPath = [];
                     break;
                 }
             }
             if (count == 3) {
-                return true;
+                return winPath;
             }
             count = 0;
 
             //2: start from [0][2][selectedPoint[2]]
             for (i = 0; i < 3; i++) {
-                if (this.board[i][2 - i][selectedPoint[2]] == turn)
+                if (this.board[i][2 - i][selectedPoint[2]] == turn) {
                     count++;
-                else {
+                    winPath.push([i, 2 - i, selectedPoint[2]]);
+                } else {
+                    winPath = [];
                     break;
                 }
             }
 
             if (count == 3) {
-                return true;
+                return winPath;
             }
             count = 0;
 
@@ -121,15 +196,17 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
 
             for (i = 0; i < 3; i++) {
-                if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1] + (i * secondMate)][selectedPoint[2]] == turn)
+                if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1] + (i * secondMate)][selectedPoint[2]] == turn) {
                     count++;
-                else {
+                    winPath.push([selectedPoint[0] + (i * firstMate), selectedPoint[1] + (i * secondMate), selectedPoint[2]]);
+                } else {
+                    winPath = [];
                     break;
                 }
             }
 
             if (count == 3) {
-                return true;
+                return winPath;
             }
             count = 0;
         }
@@ -140,28 +217,32 @@ Logic.prototype.winCheck = function (selectedPoint) {
         if (selectedPoint[0] == 1) { //middle board
             //1: start from [0][selectedPoint[1]][0]
             for (i = 0; i < 3; i++) {
-                if (this.board[i][selectedPoint[1]][i] == turn)
+                if (this.board[i][selectedPoint[1]][i] == turn) {
                     count++;
-                else {
+                    winPath.push([i, selectedPoint[1], i]);
+                } else {
+                    winPath = [];
                     break;
                 }
             }
             if (count == 3) {
-                return true;
+                return winPath;
             }
             count = 0;
 
             //2: start from [0][selectedPoint[1]][2]
             for (i = 0; i < 3; i++) {
-                if (this.board[i][selectedPoint[1]][2 - i] == turn)
+                if (this.board[i][selectedPoint[1]][2 - i] == turn) {
                     count++;
-                else {
+                    winPath.push([i, selectedPoint[1], 2 - i]);
+                } else {
+                    winPath = [];
                     break;
                 }
             }
 
             if (count == 3) {
-                return true;
+                return winPath;
             }
             count = 0;
 
@@ -179,15 +260,17 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
 
             for (i = 0; i < 3; i++) {
-                if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1]][selectedPoint[2] + (i * secondMate)] == turn)
+                if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1]][selectedPoint[2] + (i * secondMate)] == turn) {
                     count++;
-                else {
+                    winPath.push([selectedPoint[0] + (i * firstMate), selectedPoint[1], selectedPoint[2] + (i * secondMate)]);
+                } else {
+                    winPath = [];
                     break;
                 }
             }
 
             if (count == 3) {
-                return true;
+                return winPath;
             }
             count = 0;
 
@@ -200,54 +283,62 @@ Logic.prototype.winCheck = function (selectedPoint) {
     if (selectedPoint[0] == 1 && selectedPoint[1] == 1 && selectedPoint[2] == 1) {
         //1: start from [0][0][0]
         for (i = 0; i < 3; i++) {
-            if (this.board[i][i][i] == turn)
+            if (this.board[i][i][i] == turn) {
                 count++;
-            else {
+                winPath.push([i, i, i]);
+            } else {
+                winPath = [];
                 break;
             }
         }
         if (count == 3) {
-            return true;
+            return winPath;
         }
         count = 0;
 
 
         //2: start from [0][0][2]
         for (i = 0; i < 3; i++) {
-            if (this.board[i][i][2 - i] == turn)
+            if (this.board[i][i][2 - i] == turn) {
                 count++;
-            else {
+                winPath.push([i, i, 2 - i]);
+            } else {
+                winPath = [];
                 break;
             }
         }
         if (count == 3) {
-            return true;
+            return winPath;
         }
         count = 0;
 
         //3: start from [0][2][0]
         for (i = 0; i < 3; i++) {
-            if (this.board[i][2 - i][i] == turn)
+            if (this.board[i][2 - i][i] == turn) {
                 count++;
-            else {
+                winPath.push([i, 2 - i, i]);
+            } else {
+                winPath = [];
                 break;
             }
         }
         if (count == 3) {
-            return true;
+            return winPath;
         }
         count = 0;
 
         //4: start from [0][2][2]
         for (i = 0; i < 3; i++) {
-            if (this.board[i][2 - i][2 - i] == turn)
+            if (this.board[i][2 - i][2 - i] == turn) {
                 count++;
-            else {
+                winPath.push([i, 2 - i, 2 - i]);
+            } else {
+                winPath = [];
                 break;
             }
         }
         if (count == 3) {
-            return true;
+            return winPath;
         }
         count = 0;
 
@@ -270,19 +361,21 @@ Logic.prototype.winCheck = function (selectedPoint) {
         }
 
         for (i = 0; i < 3; i++) {
-            if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1] + (i * secondMate)][selectedPoint[2] + (i * thirdMate)] == turn)
+            if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1] + (i * secondMate)][selectedPoint[2] + (i * thirdMate)] == turn) {
                 count++;
-            else {
+                winPath.push([selectedPoint[0] + (i * firstMate), selectedPoint[1] + (i * secondMate), selectedPoint[2] + (i * thirdMate)]);
+            } else {
+                winPath = [];
                 break;
             }
         }
         if (count == 3) {
-            return true;
+            return winPath;
         }
         count = 0;
     }
 
-    return false;
+    return winPath;
 }
 
 Logic.prototype.changeTurn = function () {
