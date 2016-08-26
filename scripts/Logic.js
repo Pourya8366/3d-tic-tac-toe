@@ -3,8 +3,11 @@ function Logic() {
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-        ]
-        //1 for w, -1 for b
+        ];
+
+    this.availablePoints = 27;
+
+    //1 for w, -1 for b
     this.currentPlayer = 'w';
 }
 
@@ -14,6 +17,7 @@ Logic.prototype.fillInBoard = function (selectedPoint) {
     } else {
         this.board[selectedPoint[0]][selectedPoint[1]][selectedPoint[2]] = -1;
     }
+    this.availablePoints--;
 }
 
 Logic.prototype.winCheck = function (selectedPoint) {
@@ -44,7 +48,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
     }
 
     if (count == 3) {
-        return winPath;
+        return [1, winPath];
     }
 
     count = 0;
@@ -61,7 +65,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
     }
 
     if (count == 3) {
-        return winPath;
+        return [1, winPath];
     }
 
     count = 0;
@@ -78,7 +82,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
     }
 
     if (count == 3) {
-        return winPath;
+        return [1, winPath];
     }
 
     count = 0;
@@ -108,7 +112,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
         }
         if (count == 3) {
-            return winPath;
+            return [1, winPath];
         }
         count = 0;
     } else if (selectedPoint[1] == 1 && selectedPoint[2] == 1) {
@@ -125,7 +129,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
         }
         if (count == 3) {
-            return winPath;
+            return [1, winPath];
         }
         count = 0;
 
@@ -140,17 +144,17 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
         }
         if (count == 3) {
-            return winPath;
+            return [1, winPath];
         }
         count = 0;
     }
 
     var validityForCheck1 = Math.abs(selectedPoint[0] - selectedPoint[1]);
     var validityForCheck2 = Math.abs(selectedPoint[0] - selectedPoint[2]);
-    
+
     firstMate = 1;
     secondMate = 1;
-    
+
     //Change x and y
     if (validityForCheck1 != 1) { //Allow for check
         if (selectedPoint[0] == 1) { //middle board
@@ -165,7 +169,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
                 }
             }
             if (count == 3) {
-                return winPath;
+                return [1, winPath];
             }
             count = 0;
 
@@ -181,7 +185,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
 
             if (count == 3) {
-                return winPath;
+                return [1, winPath];
             }
             count = 0;
 
@@ -206,7 +210,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
 
             if (count == 3) {
-                return winPath;
+                return [1, winPath];
             }
             count = 0;
         }
@@ -226,7 +230,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
                 }
             }
             if (count == 3) {
-                return winPath;
+                return [1, winPath];
             }
             count = 0;
 
@@ -242,7 +246,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
 
             if (count == 3) {
-                return winPath;
+                return [1, winPath];
             }
             count = 0;
 
@@ -270,7 +274,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
 
             if (count == 3) {
-                return winPath;
+                return [1, winPath];
             }
             count = 0;
 
@@ -292,7 +296,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
         }
         if (count == 3) {
-            return winPath;
+            return [1, winPath];
         }
         count = 0;
 
@@ -308,7 +312,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
         }
         if (count == 3) {
-            return winPath;
+            return [1, winPath];
         }
         count = 0;
 
@@ -323,7 +327,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
         }
         if (count == 3) {
-            return winPath;
+            return [1, winPath];
         }
         count = 0;
 
@@ -338,7 +342,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
         }
         if (count == 3) {
-            return winPath;
+            return [1, winPath];
         }
         count = 0;
 
@@ -370,12 +374,16 @@ Logic.prototype.winCheck = function (selectedPoint) {
             }
         }
         if (count == 3) {
-            return winPath;
+            return [1, winPath];
         }
         count = 0;
     }
 
-    return winPath;
+    if (this.availablePoints = 0) {
+        return [0, winPath];
+    }
+
+    return [-1, winPath];
 }
 
 Logic.prototype.changeTurn = function () {

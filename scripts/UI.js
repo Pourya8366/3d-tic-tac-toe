@@ -2,6 +2,7 @@ var selectedPoint = [];
 var logic = new Logic();
 
 $(function () {
+    
     $(".point").on("click", function () {
         var selectedPointID = $(this).attr("id");
 
@@ -16,14 +17,17 @@ $(function () {
 
         var winPath = logic.winCheck(selectedPoint);
 
-        if (winPath.length != 0) {
-            showWinPath(winPath);
-            alert(logic.currentPlayer + " win!");
-        } else {
+        if (winPath[0] == -1) { //Keep going!
             logic.changeTurn();
             selectedPoint = [];
+        } else if (winPath[0] == 0) { // Tie!
+            alert("Tie!");
+        } else { //Win!
+            showWinPath(winPath[1]);
+            alert(logic.currentPlayer + " win!");
         }
     });
+    
 });
 
 function showWinPath(winPath) {
