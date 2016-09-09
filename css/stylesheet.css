@@ -10,9 +10,9 @@
 }
 
 .point{
-    height: 5.56vw;
-    width: 14.81vw; 
-    transform: skewX(-36.6055deg);
+    height: 2.8645vh;
+    width: 8.8541vh; 
+    transform: skewX(-20deg);
     position: fixed;
-    background-color: red;
+    background-color: none;
 }

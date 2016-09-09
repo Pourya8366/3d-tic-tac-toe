@@ -1,11 +1,12 @@
 function Logic() {
     this.board = [
-            [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-            [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-            [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+            [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+            [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+            [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+            [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
         ];
 
-    this.availablePoints = 27;
+    this.availablePoints = 64;
 
     //1 for w, -1 for b
     this.currentPlayer = 'w';
@@ -28,7 +29,8 @@ Logic.prototype.winCheck = function (selectedPoint) {
         turn = 1,
         firstMate = 1,
         secondMate = 1,
-        winPath = [];
+        winPath = [],
+        startPoint = [];
 
     if (this.currentPlayer == 'b') {
         turn = -1;
@@ -37,7 +39,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
     //-------------------------------------- One change! ------------------------------------------
 
     //change x
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 4; i++) {
         if (this.board[i][selectedPoint[1]][selectedPoint[2]] == turn) {
             count++;
             winPath.push([i, selectedPoint[1], selectedPoint[2]]);
@@ -47,14 +49,14 @@ Logic.prototype.winCheck = function (selectedPoint) {
         }
     }
 
-    if (count == 3) {
+    if (count == 4) {
         return [1, winPath];
     }
 
     count = 0;
 
     //change y
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 4; i++) {
         if (this.board[selectedPoint[0]][i][selectedPoint[2]] == turn) {
             count++;
             winPath.push([selectedPoint[0], i, selectedPoint[2]]);
@@ -64,14 +66,14 @@ Logic.prototype.winCheck = function (selectedPoint) {
         }
     }
 
-    if (count == 3) {
+    if (count == 4) {
         return [1, winPath];
     }
 
     count = 0;
 
     //change z
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 4; i++) {
         if (this.board[selectedPoint[0]][selectedPoint[1]][i] == turn) {
             count++;
             winPath.push([selectedPoint[0], selectedPoint[1], i]);
@@ -81,7 +83,7 @@ Logic.prototype.winCheck = function (selectedPoint) {
         }
     }
 
-    if (count == 3) {
+    if (count == 4) {
         return [1, winPath];
     }
 
@@ -89,291 +91,145 @@ Logic.prototype.winCheck = function (selectedPoint) {
 
     //-------------------------------------- two change! ------------------------------------------
 
-    firstMate = 1;
-    secondMate = 1;
-
-    if (selectedPoint[1] == 2) {
-        firstMate = -1;
-    }
-
-    if (selectedPoint[2] == 2) {
-        secondMate = -1;
-    }
-
     //change y and z
-    if (selectedPoint[1] != 1 && selectedPoint[2] != 1) {
-        for (i = 0; i < 3; i++) {
-            if (this.board[selectedPoint[0]][selectedPoint[1] + (i * firstMate)][selectedPoint[2] + (i * secondMate)] == turn) {
-                count++;
-                winPath.push([selectedPoint[0], selectedPoint[1] + (i * firstMate), selectedPoint[2] + (i * secondMate)]);
-            } else {
-                winPath = [];
-                break;
-            }
-        }
-        if (count == 3) {
-            return [1, winPath];
-        }
-        count = 0;
-    } else if (selectedPoint[1] == 1 && selectedPoint[2] == 1) {
-        //middle point
-
-        //1: start from selectedPoint[0][0][0]
-        for (i = 0; i < 3; i++) {
-            if (this.board[selectedPoint[0]][i][i] == turn) {
-                count++;
-                winPath.push([selectedPoint[0], i, i]);
-            } else {
-                winPath = [];
-                break;
-            }
-        }
-        if (count == 3) {
-            return [1, winPath];
-        }
-        count = 0;
-
-        //2: start from selectedPoint[0][2][0]
-        for (i = 0; i < 3; i++) {
-            if (this.board[selectedPoint[0]][2 - i][i] == turn) {
-                count++;
-                winPath.push([selectedPoint[0], 2 - i, i]);
-            } else {
-                winPath = [];
-                break;
-            }
-        }
-        if (count == 3) {
-            return [1, winPath];
-        }
-        count = 0;
-    }
-
-    var validityForCheck1 = Math.abs(selectedPoint[0] - selectedPoint[1]);
-    var validityForCheck2 = Math.abs(selectedPoint[0] - selectedPoint[2]);
-
     firstMate = 1;
     secondMate = 1;
+    startPoint = [];
 
-    //Change x and y
-    if (validityForCheck1 != 1) { //Allow for check
-        if (selectedPoint[0] == 1) { //middle board
-            //1: start from [0][0][selectedPoint[2]]
-            for (i = 0; i < 3; i++) {
-                if (this.board[i][i][selectedPoint[2]] == turn) {
-                    count++;
-                    winPath.push([i, i, selectedPoint[2]]);
-                } else {
-                    winPath = [];
-                    break;
-                }
-            }
-            if (count == 3) {
-                return [1, winPath];
-            }
-            count = 0;
+    if (selectedPoint[1] == selectedPoint[2] || (selectedPoint[1] + selectedPoint[2]) == 3) {
 
-            //2: start from [0][2][selectedPoint[2]]
-            for (i = 0; i < 3; i++) {
-                if (this.board[i][2 - i][selectedPoint[2]] == turn) {
-                    count++;
-                    winPath.push([i, 2 - i, selectedPoint[2]]);
-                } else {
-                    winPath = [];
-                    break;
-                }
-            }
-
-            if (count == 3) {
-                return [1, winPath];
-            }
-            count = 0;
-
+        if (selectedPoint[1] == selectedPoint[2]) {
+            startPoint = [selectedPoint[0], 0, 0];
         } else {
-            //other top or bottom boards
-            if (selectedPoint[0] == 2) {
-                firstMate = -1;
-            }
-
-            if (selectedPoint[1] == 2) {
-                secondMate = -1;
-            }
-
-            for (i = 0; i < 3; i++) {
-                if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1] + (i * secondMate)][selectedPoint[2]] == turn) {
-                    count++;
-                    winPath.push([selectedPoint[0] + (i * firstMate), selectedPoint[1] + (i * secondMate), selectedPoint[2]]);
-                } else {
-                    winPath = [];
-                    break;
-                }
-            }
-
-            if (count == 3) {
-                return [1, winPath];
-            }
-            count = 0;
-        }
-    }
-
-    //change x and z
-    if (validityForCheck2 != 1) { //Allow for check
-        if (selectedPoint[0] == 1) { //middle board
-            //1: start from [0][selectedPoint[1]][0]
-            for (i = 0; i < 3; i++) {
-                if (this.board[i][selectedPoint[1]][i] == turn) {
-                    count++;
-                    winPath.push([i, selectedPoint[1], i]);
-                } else {
-                    winPath = [];
-                    break;
-                }
-            }
-            if (count == 3) {
-                return [1, winPath];
-            }
-            count = 0;
-
-            //2: start from [0][selectedPoint[1]][2]
-            for (i = 0; i < 3; i++) {
-                if (this.board[i][selectedPoint[1]][2 - i] == turn) {
-                    count++;
-                    winPath.push([i, selectedPoint[1], 2 - i]);
-                } else {
-                    winPath = [];
-                    break;
-                }
-            }
-
-            if (count == 3) {
-                return [1, winPath];
-            }
-            count = 0;
-
-        } else {
-            //other top or bottom boards
-            firstMate = 1;
-            secondMate = 1;
-
-            if (selectedPoint[0] == 2) {
-                firstMate = -1;
-            }
-
-            if (selectedPoint[2] == 2) {
-                secondMate = -1;
-            }
-
-            for (i = 0; i < 3; i++) {
-                if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1]][selectedPoint[2] + (i * secondMate)] == turn) {
-                    count++;
-                    winPath.push([selectedPoint[0] + (i * firstMate), selectedPoint[1], selectedPoint[2] + (i * secondMate)]);
-                } else {
-                    winPath = [];
-                    break;
-                }
-            }
-
-            if (count == 3) {
-                return [1, winPath];
-            }
-            count = 0;
-
-        }
-    }
-
-    //-------------------------------------- three change! ------------------------------------------
-
-    //middle point --- special point!
-    if (selectedPoint[0] == 1 && selectedPoint[1] == 1 && selectedPoint[2] == 1) {
-        //1: start from [0][0][0]
-        for (i = 0; i < 3; i++) {
-            if (this.board[i][i][i] == turn) {
-                count++;
-                winPath.push([i, i, i]);
-            } else {
-                winPath = [];
-                break;
-            }
-        }
-        if (count == 3) {
-            return [1, winPath];
-        }
-        count = 0;
-
-
-        //2: start from [0][0][2]
-        for (i = 0; i < 3; i++) {
-            if (this.board[i][i][2 - i] == turn) {
-                count++;
-                winPath.push([i, i, 2 - i]);
-            } else {
-                winPath = [];
-                break;
-            }
-        }
-        if (count == 3) {
-            return [1, winPath];
-        }
-        count = 0;
-
-        //3: start from [0][2][0]
-        for (i = 0; i < 3; i++) {
-            if (this.board[i][2 - i][i] == turn) {
-                count++;
-                winPath.push([i, 2 - i, i]);
-            } else {
-                winPath = [];
-                break;
-            }
-        }
-        if (count == 3) {
-            return [1, winPath];
-        }
-        count = 0;
-
-        //4: start from [0][2][2]
-        for (i = 0; i < 3; i++) {
-            if (this.board[i][2 - i][2 - i] == turn) {
-                count++;
-                winPath.push([i, 2 - i, 2 - i]);
-            } else {
-                winPath = [];
-                break;
-            }
-        }
-        if (count == 3) {
-            return [1, winPath];
-        }
-        count = 0;
-
-    } else if (selectedPoint[0] != 1 && selectedPoint[1] != 1 && selectedPoint[2] != 1) {
-        //Four points in corners
-        firstMate = 1;
-        secondMate = 1;
-        thirdMate = 1;
-
-        if (selectedPoint[0] == 2) {
-            firstMate = -1;
-        }
-
-        if (selectedPoint[1] == 2) {
+            startPoint = [selectedPoint[0], 0, 3];
             secondMate = -1;
         }
 
-        if (selectedPoint[2] == 2) {
-            thirdMate = -1;
-        }
-
-        for (i = 0; i < 3; i++) {
-            if (this.board[selectedPoint[0] + (i * firstMate)][selectedPoint[1] + (i * secondMate)][selectedPoint[2] + (i * thirdMate)] == turn) {
+        for (i = 0; i < 4; i++) {
+            if (this.board[startPoint[0]][startPoint[1] + (i * firstMate)][startPoint[2] + (i * secondMate)] == turn) {
                 count++;
-                winPath.push([selectedPoint[0] + (i * firstMate), selectedPoint[1] + (i * secondMate), selectedPoint[2] + (i * thirdMate)]);
+                winPath.push([startPoint[0], startPoint[1] + (i * firstMate), startPoint[2] + (i * secondMate)]);
             } else {
                 winPath = [];
                 break;
             }
         }
-        if (count == 3) {
+        if (count == 4) {
+            return [1, winPath];
+        }
+        count = 0;
+
+    }
+
+    //Change x and y
+    firstMate = 1;
+    secondMate = 1;
+    startPoint = [];
+    var startPattern = /^([03][03]|[12][12])/;
+    var pointForTest = "" + selectedPoint[0] + selectedPoint[1];
+
+    if (startPattern.test(pointForTest)) {
+
+        if (selectedPoint[0] == selectedPoint[1]) {
+            startPoint = [0, 0, selectedPoint[2]];
+        } else {
+            startPoint = [0, 3, selectedPoint[2]];
+            secondMate = -1;
+        }
+
+        for (i = 0; i < 4; i++) {
+            if (this.board[startPoint[0] + (i * firstMate)][startPoint[1] + (i * secondMate)][startPoint[2]] == turn) {
+                count++;
+                winPath.push([startPoint[0] + (i * firstMate), startPoint[1] + (i * secondMate), startPoint[2]]);
+            } else {
+                winPath = [];
+                break;
+            }
+        }
+
+        if (count == 4) {
+            return [1, winPath];
+        }
+        count = 0;
+    }
+
+    //change x and z
+    firstMate = 1;
+    secondMate = 1;
+    startPoint = [];
+    var startPattern = /^([03][03]|[12][12])/;
+    var pointForTest = "" + selectedPoint[0] + selectedPoint[2];
+
+
+    if (startPattern.test(pointForTest)) {
+
+        firstMate = 1;
+        secondMate = 1;
+
+        if (selectedPoint[0] == selectedPoint[2]) {
+            startPoint = [0, selectedPoint[1], 0];
+        } else {
+            startPoint = [0, selectedPoint[1], 3];
+            secondMate = -1;
+        }
+
+        for (i = 0; i < 4; i++) {
+            if (this.board[startPoint[0] + (i * firstMate)][startPoint[1]][startPoint[2] + (i * secondMate)] == turn) {
+                count++;
+                winPath.push([startPoint[0] + (i * firstMate), startPoint[1], startPoint[2] + (i * secondMate)]);
+            } else {
+                winPath = [];
+                break;
+            }
+        }
+
+        if (count == 4) {
+            return [1, winPath];
+        }
+        count = 0;
+    }
+
+
+    //-------------------------------------- three change! ------------------------------------------
+    var startPattern = /^([03][03][03]|[12][12][12])/;
+    var pointForTest = "" + selectedPoint[0] + selectedPoint[1] + selectedPoint[2];
+
+    if (startPattern.test(pointForTest)) {
+        //Four points in corners
+        firstMate = 1;
+        secondMate = 1;
+        var thirdMate = 1
+        startPoint = [];
+
+        if (selectedPoint[1] == selectedPoint[2]) {
+            if (selectedPoint[0] == selectedPoint[1]) {
+                startPoint = [0, 0, 0];
+            }else{
+                startPoint = [3, 0, 0];
+                firstMate = -1;
+            }
+
+        } else {
+            if (selectedPoint[0] == selectedPoint[1]) {
+                startPoint = [0, 0, 3];
+                thirdMate = -1;
+            }else{
+                startPoint = [0, 3, 0];
+                secondMate = -1;
+            }
+        }
+
+
+        for (i = 0; i < 4; i++) {
+            if (this.board[startPoint[0] + (i * firstMate)][startPoint[1] + (i * secondMate)][startPoint[2] + (i * thirdMate)] == turn) {
+                count++;
+                winPath.push([startPoint[0] + (i * firstMate), startPoint[1] + (i * secondMate), startPoint[2] + (i * thirdMate)]);
+            } else {
+                winPath = [];
+                break;
+            }
+        }
+        if (count == 4) {
             return [1, winPath];
         }
         count = 0;
